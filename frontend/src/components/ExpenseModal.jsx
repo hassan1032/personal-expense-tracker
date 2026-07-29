@@ -1,7 +1,21 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { X } from "lucide-react";
 
 function ExpenseModal({ expense, onClose }) {
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    if (expense) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [expense, onClose]);
+
   if (!expense) return null;
 
   const getCategoryClass = (cat) => {
@@ -18,7 +32,7 @@ function ExpenseModal({ expense, onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>
+        <button className="modal-close" onClick={onClose} aria-label="Close modal">
           <X size={18} />
         </button>
         <h3 className="modal-title">Expense Details</h3>
@@ -40,9 +54,9 @@ function ExpenseModal({ expense, onClose }) {
           <span className="modal-detail-label">Date</span>
           <span className="modal-detail-value">
             {new Date(expense.date).toLocaleDateString("en-IN", { 
-              weekday: "long", 
+              weekday: "short", 
               day: "numeric", 
-              month: "long", 
+              month: "short", 
               year: "numeric" 
             })}
           </span>

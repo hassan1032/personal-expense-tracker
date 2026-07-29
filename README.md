@@ -4,14 +4,6 @@ A clean, production-ready full-stack Personal Expense Tracker application built 
 
 This project is structured cleanly with modular ES Modules (`type: module`) backend architecture and a premium single-page dashboard on the frontend.
 
----
-
-## 🌐 Live Deployment Links
-- **Live Frontend Dashboard (Render):** https://expense-tracker-0gvo.onrender.com
-- **Live Backend API Gateway (Render):** https://expense-tracker-backend-nvmg.onrender.com
-
----
-
 ## 🚀 Key Features
 - **Total Spent Dashboard:** Prominent card showing the total expenses sum dynamically calculated and formatted in Indian Rupees (₹).
 - **Add Expense Form:** Intuitive controlled form validation for Amount, Description, Category, and Date.

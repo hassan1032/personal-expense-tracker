@@ -1,4 +1,4 @@
-  import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { 
   getExpenses, 
   createExpense, 
@@ -16,6 +16,18 @@ function App() {
   const [editingId, setEditingId] = useState(null);
   const [viewingExpense, setViewingExpense] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+
+  // Search, Filter & Pagination States
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [totalSpent, setTotalSpent] = useState(0);
+
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem("theme") || "dark";
   });
@@ -32,9 +44,37 @@ function App() {
     message: ""
   });
 
+  const fetchExpenses = useCallback(async () => {
+    try {
+      setLoading(true);
+      const params = {
+        page,
+        limit
+      };
+
+      if (search.trim() !== "") params.search = search.trim();
+      if (categoryFilter !== "All") params.category = categoryFilter;
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+
+      const res = await getExpenses(params);
+      if (res.success) {
+        setExpenses(res.data || []);
+        setTotalPages(res.totalPages || 1);
+        setTotalCount(res.totalCount || 0);
+        setTotalSpent(res.totalSpent || 0);
+      }
+    } catch (err) {
+      console.error(err);
+      showStatus(false, "Failed to load expenses");
+    } finally {
+      setLoading(false);
+    }
+  }, [search, categoryFilter, startDate, endDate, page, limit]);
+
   useEffect(() => {
     fetchExpenses();
-  }, []);
+  }, [fetchExpenses]);
 
   useEffect(() => {
     document.documentElement.className = theme;
@@ -43,21 +83,6 @@ function App() {
 
   const toggleTheme = () => {
     setTheme(prev => (prev === "dark" ? "light" : "dark"));
-  };
-
-  const fetchExpenses = async () => {
-    try {
-      setLoading(true);
-      const res = await getExpenses();
-      if (res.success) {
-        setExpenses(res.data);
-      }
-    } catch (err) {
-      console.error(err);
-      showStatus(false, "Failed to load expenses");
-    } finally {
-      setLoading(false);
-    }
   };
 
   const showStatus = (isSuccess, text) => {
@@ -155,7 +180,38 @@ function App() {
     });
   };
 
-  const totalSpent = expenses.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
+  const handleResetFilters = () => {
+    setSearch("");
+    setCategoryFilter("All");
+    setStartDate("");
+    setEndDate("");
+    setPage(1);
+  };
+
+  const handleSearchChange = (val) => {
+    setSearch(val);
+    setPage(1);
+  };
+
+  const handleCategoryChange = (val) => {
+    setCategoryFilter(val);
+    setPage(1);
+  };
+
+  const handleStartDateChange = (val) => {
+    setStartDate(val);
+    setPage(1);
+  };
+
+  const handleEndDateChange = (val) => {
+    setEndDate(val);
+    setPage(1);
+  };
+
+  const handleLimitChange = (val) => {
+    setLimit(val);
+    setPage(1);
+  };
 
   return (
     <div className="app-container">
@@ -204,6 +260,21 @@ function App() {
           onView={setViewingExpense}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
+          search={search}
+          onSearchChange={handleSearchChange}
+          categoryFilter={categoryFilter}
+          onCategoryFilterChange={handleCategoryChange}
+          startDate={startDate}
+          onStartDateChange={handleStartDateChange}
+          endDate={endDate}
+          onEndDateChange={handleEndDateChange}
+          onResetFilters={handleResetFilters}
+          page={page}
+          totalPages={totalPages}
+          totalCount={totalCount}
+          limit={limit}
+          onPageChange={setPage}
+          onLimitChange={handleLimitChange}
         />
       </div>
 
