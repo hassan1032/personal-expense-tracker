@@ -880,9 +880,14 @@ select.filter-input {
   }
 
   .filter-bar {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 0.5rem;
   }
+
+  .filter-bar > :nth-child(1) { grid-column: span 2; }
+  .filter-bar > :nth-child(2) { grid-column: span 2; }
+  .filter-bar > :nth-child(3) { grid-column: span 1; }
+  .filter-bar > :nth-child(4) { grid-column: span 1; }
 
   .pagination-bar {
     flex-direction: column;
