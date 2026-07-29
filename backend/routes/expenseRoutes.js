@@ -3,6 +3,7 @@ const router = express.Router();
 import {
   getExpenses,
   createExpense,
+  updateExpense,
   deleteExpense
 } from "../controllers/expenseController.js";
 import {
@@ -15,6 +16,7 @@ router.route("/")
   .post(expenseValidationRules, validateExpense, createExpense);
 
 router.route("/:id")
+  .put(expenseValidationRules, validateExpense, updateExpense)
   .delete(deleteExpense);
 
 export default router;
